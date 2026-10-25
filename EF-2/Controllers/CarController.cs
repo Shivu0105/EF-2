@@ -1,5 +1,6 @@
 ﻿using EF_2.Model;
 using EF_2.Repository;
+using EF_2.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +11,10 @@ namespace EF_2.Controllers
     [ApiController]
     public class CarController : ControllerBase
     {
-        private readonly CarDB _car;
-        public CarController(CarDB car)
+        private readonly CarService _carService;
+        public CarController(CarService car)
         {
-            _car = car;
+            _carService = car;
         }
 
         [HttpGet]
@@ -21,7 +22,7 @@ namespace EF_2.Controllers
         {
             try
             {
-                var carData = await _car.CarsTable.ToListAsync();
+                var carData = await _carService.GetCarsAsync();
                 return Ok(carData);
             }
             catch (Exception ex)
@@ -35,10 +36,8 @@ namespace EF_2.Controllers
         {
             try
             {
-                _car.CarsTable.Add(entity);
-                await _car.SaveChangesAsync();
-
-                return Ok("Data Saved Successfully");
+                var result = await _carService.AddCars(entity);
+                return Ok(result);
             }
             catch(Exception ex)
             {
@@ -51,16 +50,9 @@ namespace EF_2.Controllers
         {
             try
             {
-                var entity = await _car.CarsTable.FindAsync(Id);
-                if (entity == null)
-                {
-                    return NotFound("Car not found");
-                }
+                var result = await _carService.DeleteCar(Id);
 
-                _car.CarsTable.Remove(entity);
-                await _car.SaveChangesAsync();
-
-                return Ok("Data Deleted Successfully");
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -73,19 +65,8 @@ namespace EF_2.Controllers
         {
             try
             {
-                var existingCar = await _car.CarsTable.FindAsync(Id);
-                if (existingCar == null)
-                {
-                    return NotFound("Car not found");
-                }
-                existingCar.Name = entity.Name;
-                existingCar.Model = entity.Model;
-                existingCar.Color = entity.Color;
-                existingCar.Year = entity.Year;
-
-                _car.CarsTable.Update(existingCar);
-                await _car.SaveChangesAsync();
-                return Ok("Data Updated Successfully");
+                var result = await _carService.UpdateCar(Id, entity);
+                return Ok(result);
             }
             catch (Exception ex)
             {

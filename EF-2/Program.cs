@@ -1,5 +1,6 @@
 
 using EF_2.Repository;
+using EF_2.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace EF_2
@@ -21,6 +22,8 @@ namespace EF_2
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            builder.Services.AddScoped<CarService>();
 
             var app = builder.Build();
 
